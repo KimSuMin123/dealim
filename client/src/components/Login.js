@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const Login = () => {
-  const [emailOrPhone, setEmailOrPhone] = useState('');
+  const [studentIdOrPhone, setStudentIdOrPhone] = useState(''); // 이메일 대신 학번 또는 전화번호 사용
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -14,7 +14,7 @@ const Login = () => {
 
     try {
       const response = await axios.post('http://localhost:3003/login', {
-        emailOrPhone,
+        studentIdOrPhone, // 수정된 필드명
         password
       });
       
@@ -39,12 +39,12 @@ const Login = () => {
       <h2>로그인</h2>
       <form onSubmit={handleLogin}>
         <div>
-          <label htmlFor="emailOrPhone">이메일 또는 전화번호</label>
+          <label htmlFor="studentIdOrPhone">학번 또는 전화번호</label> {/* 라벨 수정 */}
           <input
             type="text"
-            id="emailOrPhone"
-            value={emailOrPhone}
-            onChange={(e) => setEmailOrPhone(e.target.value)}
+            id="studentIdOrPhone"
+            value={studentIdOrPhone} // 상태값 변경
+            onChange={(e) => setStudentIdOrPhone(e.target.value)} // 입력 변경 핸들러 수정
             required
           />
         </div>

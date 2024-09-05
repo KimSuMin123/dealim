@@ -215,21 +215,21 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-// 로그인 API 엔드포인트
+// 로그인 API 엔드포인트 (학번 또는 전화번호로 로그인)
 app.post('/login', async (req, res) => {
-    const { emailOrPhone, password } = req.body;
+    const { studentIdOrPhone, password } = req.body;
 
-    if (!emailOrPhone || !password) {
-        return res.status(400).json({ message: '이메일 또는 전화번호와 비밀번호가 필요합니다.' });
+    if (!studentIdOrPhone || !password) {
+        return res.status(400).json({ message: '학번 또는 전화번호와 비밀번호가 필요합니다.' });
     }
 
     try {
-        // 사용자 정보 검색 (이메일 또는 전화번호로)
+        // 사용자 정보 검색 (학번 또는 전화번호로)
         const user = await User.findOne({
             where: {
                 [Sequelize.Op.or]: [
-                    { email: emailOrPhone },
-                    { phone_number: emailOrPhone }
+                    { student_id: studentIdOrPhone },  // 학번으로 검색
+                    { phone_number: studentIdOrPhone }  // 전화번호로 검색
                 ]
             }
         });
@@ -246,7 +246,7 @@ app.post('/login', async (req, res) => {
 
         // JWT 토큰 생성
         const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
-            expiresIn: '10h', // 토큰 유효 기간 설정 (예: 1시간)
+            expiresIn: '10h', // 토큰 유효 기간 설정
         });
 
         // 사용자에게 토큰 반환
