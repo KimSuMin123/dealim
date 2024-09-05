@@ -1,8 +1,10 @@
-import logo from './logo.svg';
+
 import './App.css';
 import StudentSignup from './components/StudentSignup';
 import DriverSignup from './components/DriverSignup';
 import Login from './components/Login';
+import Reservation from './components/Reservation';
+
 
 
 function App() {
@@ -11,6 +13,7 @@ function App() {
       <StudentSignup/>
       <DriverSignup/>
       <Login/>
+      <Reservation/>
     </div>
   );
 }

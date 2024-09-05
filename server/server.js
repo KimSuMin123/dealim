@@ -58,6 +58,76 @@ const User = sequelize.define('User', {
     tableName: 'Users',
     timestamps: false,
 });
+// Times 모델 정의
+const Times = sequelize.define('Times', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
+    time: {
+        type: DataTypes.STRING,  // 시간을 STRING으로 저장
+        allowNull: false,
+    },
+    people: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+}, {
+    tableName: 'times',
+    timestamps: false,
+});
+// Reservations 모델 정의
+const Reservations = sequelize.define('Reservations', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
+    student_id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        references: {
+            model: User, // Users 테이블의 외래키 참조
+            key: 'student_id',
+        },
+    },
+    reservation_time: {
+        type: DataTypes.STRING ,
+        allowNull: false,
+    },
+    created_at: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+    },
+    cancelled: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+    },
+}, {
+    tableName: 'Reservations',
+    timestamps: false,
+});
+// Backup 모델 정의
+const Backup = sequelize.define('Backup', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
+    time: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    people: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+}, {
+    tableName: 'Backup',
+    timestamps: false,
+});
+
 
 // 데이터베이스 연결 확인
 sequelize.authenticate()
@@ -255,6 +325,76 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ message: '로그인 중 오류 발생', error: error.message });
     }
 });
+// 특정 날짜의 셔틀 시간을 가져오는 API 엔드포인트
+app.get('/times', async (req, res) => {
+    try {
+        const times = await Times.findAll({
+            attributes: ['time'], // time 필드만 가져오기
+        });
+
+        if (!times.length) {
+            return res.status(404).json({ message: '셔틀 시간이 존재하지 않습니다.' });
+        }
+
+        res.status(200).json({ times });
+    } catch (error) {
+        res.status(500).json({ message: '시간 데이터를 가져오는 중 오류 발생', error: error.message });
+    }
+});
+
+const moment = require('moment');
+// 예약 API 엔드포인트 (시간을 문자열로 처리)
+app.post('/reserve', authenticateToken, async (req, res) => {
+    const { time } = req.body; // 예약하려는 시간, 예: "08:45"
+    const userId = req.user.id; // JWT를 통해 인증된 사용자 ID
+
+    if (!time) {
+        return res.status(400).json({ message: '예약 시간이 필요합니다.' });
+    }
+
+    try {
+        // 해당 시간의 기록을 찾음 (time은 문자열)
+        const timeRecord = await Times.findOne({ where: { time: time } });
+
+        if (!timeRecord) {
+            return res.status(404).json({ message: '해당 시간에 셔틀 기록이 없습니다.' });
+        }
+
+        // 예약 인원 증가
+        timeRecord.people += 1;
+        await timeRecord.save();
+
+        // Reservations 테이블에 예약 정보 저장
+        const user = await User.findOne({ where: { id: userId } }); // 사용자 정보 조회
+        await Reservations.create({
+            student_id: user.student_id,
+            reservation_time: timeRecord.time, // 시간 문자열 그대로 저장
+            created_at: new Date(),
+            cancelled: false, // 취소 여부 필드 추가
+        });
+
+        // Backup 테이블에도 정보 저장 또는 업데이트
+        const backupRecord = await Backup.findOne({ where: { time: time } });
+        if (backupRecord) {
+            // 기존 백업 레코드가 있으면 people 값을 업데이트
+            backupRecord.people += 1;
+            await backupRecord.save();
+        } else {
+            // 백업 레코드가 없으면 새로 생성
+            await Backup.create({
+                time: timeRecord.time,
+                people: 1,
+            });
+        }
+
+        res.status(200).json({ message: '예약이 완료되었습니다.', time: timeRecord.time, people: timeRecord.people });
+    } catch (error) {
+        console.error('예약 오류:', error); // 오류 로그 추가
+        res.status(500).json({ message: '예약 처리 중 오류가 발생했습니다.', error: error.message });
+    }
+});
+
+
 
 // 보호된 API 엔드포인트 예시
 app.get('/protected', authenticateToken, (req, res) => {
