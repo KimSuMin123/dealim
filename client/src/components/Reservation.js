@@ -62,25 +62,32 @@ const Reservation = () => {
     };
 
     // 셔틀 시간 예약 함수
-    const handleReservation = async () => {
-        try {
-            const token = localStorage.getItem('token'); // JWT 토큰 가져오기
-            await axios.post(
-                'http://localhost:3003/reserve',
-                { time: selectedTime, course: selectedCourse },  // course 값 추가
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            alert('예약이 성공적으로 완료되었습니다!');
-            closePopup();
-            navigate('/check');
-        } catch (error) {
+    
+const handleReservation = async () => {
+    try {
+        const token = localStorage.getItem('token'); // JWT 토큰 가져오기
+        await axios.post(
+            'http://localhost:3003/reserve',
+            { time: selectedTime, course: selectedCourse },  // course 값 추가
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        alert('예약이 성공적으로 완료되었습니다!');
+        closePopup();
+        navigate('/check');
+    } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+            // 백엔드에서 반환된 구체적인 오류 메시지 출력
+            alert(error.response.data.message);
+        } else {
+            // 일반 오류 메시지 출력
             alert('예약 중 오류가 발생했습니다. 다시 시도해주세요.');
         }
-    };
+    }
+};
 
     if (loading) {
         return <div>시간 데이터를 불러오는 중입니다...</div>;

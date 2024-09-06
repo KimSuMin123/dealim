@@ -473,7 +473,7 @@ app.get('/times/:course', async (req, res) => {
 
 // 예약 API 엔드포인트 (시간을 문자열로 처리)
 app.post('/reserve', authenticateToken, async (req, res) => {
-    const { time, course } = req.body; // 예약하려는 시간과 코스
+    const { time, course } = req.body;
     const userId = req.user.id;
 
     let Table;
@@ -499,6 +499,13 @@ app.post('/reserve', authenticateToken, async (req, res) => {
     }
 
     try {
+        const user = await User.findOne({ where: { id: userId } });
+
+        // credits 값 확인
+        if (user.credits >= 2) {
+            return res.status(400).json({ message: '예약 불가: 사용자의 예약 가능한 횟수가 초과되었습니다.' });
+        }
+
         const timeRecord = await Table.findOne({ where: { time: time } });
 
         if (!timeRecord) {
@@ -509,11 +516,14 @@ app.post('/reserve', authenticateToken, async (req, res) => {
         timeRecord.people += 1;
         await timeRecord.save();
 
-        const user = await User.findOne({ where: { id: userId } });
+        // 사용자 credits +1 증가
+        user.credits += 1;
+        await user.save();
+
         await Reservations.create({
             student_id: user.student_id,
             reservation_time: timeRecord.time,
-            course: course,  // course 값을 저장
+            course: course,
             created_at: new Date(),
             cancelled: false,
         });
@@ -523,6 +533,7 @@ app.post('/reserve', authenticateToken, async (req, res) => {
         res.status(500).json({ message: '예약 처리 중 오류가 발생했습니다.', error: error.message });
     }
 });
+
 
 
 app.post('/cancel-reservation', authenticateToken, async (req, res) => {
@@ -572,9 +583,14 @@ app.post('/cancel-reservation', authenticateToken, async (req, res) => {
             return res.status(404).json({ message: '해당 시간에 대한 레코드를 찾을 수 없습니다.' });
         }
 
+        // 사용자 credits -1 감소
+        const user = await User.findOne({ where: { id: req.user.id } });
+        user.credits -= 1;
+        await user.save();
+
         res.status(200).json({
             message: '예약이 성공적으로 삭제되었으며, 해당 시간의 사람 수가 업데이트되었습니다.',
-            updatedPeople: timeRecord ? timeRecord.people : '해당 시간이 없습니다.'
+            updatedPeople: timeRecord.people
         });
 
     } catch (error) {
