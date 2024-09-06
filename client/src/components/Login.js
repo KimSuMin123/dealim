@@ -78,10 +78,29 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate(); // useNavigate 훅 사용
 
+  // 한국 시간 구하는 함수
+  const getKoreanTime = () => {
+    const now = new Date();
+    const utcNow = now.getTime() + now.getTimezoneOffset() * 60000;
+    const koreaTimeOffset = 9 * 60 * 60000; // 한국은 UTC+9
+    return new Date(utcNow + koreaTimeOffset);
+  };
+
+  // 로그인 처리 함수
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    const koreanTime = getKoreanTime();
+    const currentHour = koreanTime.getHours();
+
+    // 07시 이전이거나 22시 이후일 경우 경고 메시지 출력
+    if (currentHour < 7 || currentHour >= 22) {
+      setError('지금은 예약가능시간이 아닙니다. 7시~22시 사이에 이용 부탁드립니다.');
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await axios.post('http://localhost:3003/login', {
