@@ -56,6 +56,9 @@ const User = sequelize.define('User', {
     verified: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+    },credits: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0, // 기본 값은 0
     },
 }, {
     tableName: 'Users',
@@ -399,28 +402,44 @@ app.post('/reserve', authenticateToken, async (req, res) => {
     }
 });
 
-// Cancel reservation by reservationId (Delete from DB)
 app.post('/cancel-reservation', authenticateToken, async (req, res) => {
     const { reservationId } = req.body;
 
     try {
         // Find the reservation by ID
         const reservation = await Reservations.findOne({ where: { id: reservationId } });
-        
+
         // If the reservation is not found, return a 404 error
         if (!reservation) {
             return res.status(404).json({ message: '예약을 찾을 수 없습니다.' });
         }
 
+        // Get the reservation time
+        const reservationTime = reservation.reservation_time; // 예약 시간 가져오기
+
         // Delete the reservation from the DB
         await reservation.destroy();
 
-        res.status(200).json({ message: '예약이 성공적으로 삭제되었습니다.' });
+        // Find the record in the Times table with the same time as the reservation time
+        const timeRecord = await Times.findOne({ where: { time: reservationTime } });
+
+        // If a time record exists and people count is greater than 0, decrease the count by 1
+        if (timeRecord && timeRecord.people > 0) {
+            timeRecord.people -= 1;
+            await timeRecord.save();
+        } else if (!timeRecord) {
+            return res.status(404).json({ message: '해당 시간에 대한 레코드를 찾을 수 없습니다.' });
+        }
+
+        res.status(200).json({ 
+            message: '예약이 성공적으로 삭제되었으며, 해당 시간의 사람 수가 업데이트되었습니다.', 
+            updatedPeople: timeRecord ? timeRecord.people : '해당 시간이 없습니다.' 
+        });
+        
     } catch (error) {
         res.status(500).json({ message: '예약 삭제 중 오류 발생', error: error.message });
     }
 });
-
 
 // Get current user and all their reservations
 app.get('/protected', authenticateToken, async (req, res) => {
