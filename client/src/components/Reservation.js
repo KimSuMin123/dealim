@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ConfirmPopup from '../components/ReservationOk';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom'; // useNavigate 훅 import
+import { useNavigate } from 'react-router-dom';
 
 const TimeGrid = styled.div`
     display: flex;
@@ -11,14 +11,13 @@ const TimeGrid = styled.div`
 `;
 
 const TimeButton = styled.button`
-    flex: 1 1 calc(20% - 10px); /* 한 줄에 5개 배치 (100% / 5 = 20%) */
+    flex: 1 1 calc(20% - 10px);
     padding: 10px;
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    text-align: center;
     
     &:hover {
         background-color: #0056b3;
@@ -30,14 +29,15 @@ const Reservation = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedTime, setSelectedTime] = useState('');
+    const [selectedCourse, setSelectedCourse] = useState('timesone'); // 코스 선택 추가
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const navigate = useNavigate(); // useNavigate 훅 사용
+    const navigate = useNavigate();
 
     // 셔틀 시간 데이터를 가져오는 함수
     useEffect(() => {
         const fetchTimes = async () => {
             try {
-                const response = await axios.get('http://localhost:3003/times');
+                const response = await axios.get(`http://localhost:3003/times/${selectedCourse}`);
                 setTimes(response.data.times);
                 setLoading(false);
             } catch (error) {
@@ -47,7 +47,7 @@ const Reservation = () => {
         };
 
         fetchTimes();
-    }, []);
+    }, [selectedCourse]);
 
     // 팝업을 열기 위한 함수
     const openPopup = (time) => {
@@ -64,10 +64,10 @@ const Reservation = () => {
     // 셔틀 시간 예약 함수
     const handleReservation = async () => {
         try {
-            const token = localStorage.getItem('token'); // 사용자의 JWT 토큰을 로컬스토리지에서 가져옴
+            const token = localStorage.getItem('token'); // JWT 토큰 가져오기
             await axios.post(
                 'http://localhost:3003/reserve',
-                { time: selectedTime },
+                { time: selectedTime, course: selectedCourse },  // course 값 추가
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -76,18 +76,16 @@ const Reservation = () => {
             );
             alert('예약이 성공적으로 완료되었습니다!');
             closePopup();
-            navigate('/check'); // 예약 성공 후 check 페이지로 이동
+            navigate('/check');
         } catch (error) {
             alert('예약 중 오류가 발생했습니다. 다시 시도해주세요.');
         }
     };
 
-    // 로딩 중일 때 표시할 내용
     if (loading) {
         return <div>시간 데이터를 불러오는 중입니다...</div>;
     }
 
-    // 에러가 발생한 경우
     if (error) {
         return <div>{error}</div>;
     }
@@ -95,6 +93,15 @@ const Reservation = () => {
     return (
         <div>
             <h2>셔틀 예약 가능한 시간 목록</h2>
+
+            {/* 코스 선택 */}
+            <select onChange={(e) => setSelectedCourse(e.target.value)} value={selectedCourse}>
+                <option value="timesone">안양역에서 학교</option>
+                <option value="timestwo">학교에서 안양역</option>
+                <option value="timesthree">범계에서 학교</option>
+                <option value="timesfour">학교에서 범계</option>
+            </select>
+
             <TimeGrid>
                 {times.length > 0 ? (
                     times.map((time, index) => (
@@ -107,7 +114,6 @@ const Reservation = () => {
                 )}
             </TimeGrid>
 
-            {/* 팝업 컴포넌트 */}
             {isPopupOpen && (
                 <ConfirmPopup
                     time={selectedTime}

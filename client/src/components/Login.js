@@ -1,6 +1,75 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // useNavigate 훅 import
+import styled from 'styled-components'; // styled-components import
+
+// 스타일 정의
+const LoginContainer = styled.div`
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+`;
+
+const Title = styled.h2`
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+`;
+
+const Label = styled.label`
+  margin-bottom: 8px;
+  color: #333;
+`;
+
+const Input = styled.input`
+  padding: 10px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+`;
+
+const Button = styled.button`
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  &:disabled {
+    background-color: #ccc;
+  }
+`;
+
+const ErrorMessage = styled.p`
+  color: red;
+  text-align: center;
+`;
+
+const SignupButtons = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+`;
+
+const SignupButton = styled.button`
+  padding: 10px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+`;
 
 const Login = () => {
   const [studentIdOrPhone, setStudentIdOrPhone] = useState(''); // 학번 또는 전화번호
@@ -43,6 +112,7 @@ const Login = () => {
       setLoading(false);
     }
   };
+  
   const handleStudentSignup = () => {
     navigate('/student-signup'); // 학생 회원가입 페이지로 이동
   };
@@ -51,14 +121,13 @@ const Login = () => {
     navigate('/driver-signup'); // 기사 회원가입 페이지로 이동
   };
 
-
   return (
-    <div className="login-container">
-      <h2>로그인</h2>
-      <form onSubmit={handleLogin}>
+    <LoginContainer>
+      <Title>로그인</Title>
+      <Form onSubmit={handleLogin}>
         <div>
-          <label htmlFor="studentIdOrPhone">학번 또는 전화번호</label>
-          <input
+          <Label htmlFor="studentIdOrPhone">학번 또는 전화번호</Label>
+          <Input
             type="text"
             id="studentIdOrPhone"
             value={studentIdOrPhone}
@@ -67,8 +136,8 @@ const Login = () => {
           />
         </div>
         <div>
-          <label htmlFor="password">비밀번호</label>
-          <input
+          <Label htmlFor="password">비밀번호</Label>
+          <Input
             type="password"
             id="password"
             value={password}
@@ -76,16 +145,16 @@ const Login = () => {
             required
           />
         </div>
-        <button type="submit" disabled={loading}>
+        <Button type="submit" disabled={loading}>
           {loading ? '로그인 중...' : '로그인'}
-        </button>
-      </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-       <div className="signup-buttons">
-        <button onClick={handleStudentSignup}>학생 회원가입</button>
-        <button onClick={handleDriverSignup}>기사 회원가입</button>
-      </div>
-    </div>
+        </Button>
+      </Form>
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+      <SignupButtons>
+        <SignupButton onClick={handleStudentSignup}>학생 회원가입</SignupButton>
+        <SignupButton onClick={handleDriverSignup}>기사 회원가입</SignupButton>
+      </SignupButtons>
+    </LoginContainer>
   );
 };
 

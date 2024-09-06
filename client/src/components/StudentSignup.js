@@ -1,7 +1,64 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // useNavigate 훅 import
+import styled from 'styled-components'; // styled-components import
 
-function StudentSignup() {
+// 스타일 정의
+const Container = styled.div`
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+`;
+
+const Title = styled.h2`
+  text-align: center;
+  margin-bottom: 20px;
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+`;
+
+const Label = styled.label`
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #333;
+`;
+
+const Input = styled.input`
+  padding: 10px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+`;
+
+const Button = styled.button`
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
+
+const Message = styled.p`
+  text-align: center;
+  font-size: 14px;
+  color: ${(props) => props.color || 'black'};
+`;
+
+const StudentSignup = () => {
   const [name, setName] = useState('');
   const [studentId, setStudentId] = useState('');
   const [phone, setPhone] = useState('');
@@ -96,13 +153,13 @@ function StudentSignup() {
   };
 
   return (
-    <div className="container">
-      <h2>학생 회원가입</h2>
+    <Container>
+      <Title>학생 회원가입</Title>
 
       {/* 기본 정보 입력 폼 */}
-      <form>
-        <label htmlFor="name">이름을 입력하세요:</label>
-        <input
+      <Form>
+        <Label htmlFor="name">이름을 입력하세요:</Label>
+        <Input
           type="text"
           id="name"
           value={name}
@@ -110,8 +167,8 @@ function StudentSignup() {
           required
           placeholder="이름을 입력하세요"
         />
-        <label htmlFor="studentId">학번을 입력하세요:</label>
-        <input
+        <Label htmlFor="studentId">학번을 입력하세요:</Label>
+        <Input
           type="text"
           id="studentId"
           value={studentId}
@@ -119,8 +176,8 @@ function StudentSignup() {
           required
           placeholder="학번을 입력하세요"
         />
-        <label htmlFor="phone">전화번호를 입력하세요:</label>
-        <input
+        <Label htmlFor="phone">전화번호를 입력하세요:</Label>
+        <Input
           type="text"
           id="phone"
           value={phone}
@@ -128,8 +185,8 @@ function StudentSignup() {
           required
           placeholder="전화번호를 입력하세요"
         />
-        <label htmlFor="password">비밀번호를 입력하세요:</label> {/* 비밀번호 입력란 추가 */}
-        <input
+        <Label htmlFor="password">비밀번호를 입력하세요:</Label> {/* 비밀번호 입력란 추가 */}
+        <Input
           type="password"
           id="password"
           value={password}
@@ -137,25 +194,25 @@ function StudentSignup() {
           required
           placeholder="비밀번호를 입력하세요"
         />
-      </form>
+      </Form>
 
       {/* 인증번호 요청 폼 */}
-      <form onSubmit={requestVerificationCode}>
-        <label htmlFor="email">이메일:</label>
-        <input
+      <Form onSubmit={requestVerificationCode}>
+        <Label htmlFor="email">이메일:</Label>
+        <Input
           type="email"
           id="email"
           value={email}
           readOnly
           placeholder="자동 생성된 이메일"
         />
-        <button type="submit">인증번호 전송</button>
-      </form>
+        <Button type="submit">인증번호 전송</Button>
+      </Form>
 
       {/* 인증번호 확인 폼 */}
-      <form onSubmit={verifyCode}>
-        <label htmlFor="code">인증번호를 입력하세요:</label>
-        <input
+      <Form onSubmit={verifyCode}>
+        <Label htmlFor="code">인증번호를 입력하세요:</Label>
+        <Input
           type="text"
           id="code"
           value={verificationCode}
@@ -163,16 +220,15 @@ function StudentSignup() {
           required
           placeholder="수신한 인증번호를 입력하세요"
         />
-        <button type="submit">인증번호 확인</button>
-      </form>
+        <Button type="submit">인증번호 확인</Button>
+      </Form>
 
-      <p style={{ color: messageColor }}>{responseMessage}</p>
+      <Message color={messageColor}>{responseMessage}</Message>
 
       {/* 로그인으로 이동하는 버튼 추가 */}
-      <button onClick={handleLogin}>로그인</button>
-    </div>
+      <Button onClick={handleLogin}>로그인</Button>
+    </Container>
   );
 }
 
 export default StudentSignup;
-

@@ -100,6 +100,22 @@ const Check = () => {
         fetchUserAndReservations();
     }, []);
 
+    // 코스 이름 변환 함수
+    const getCourseName = (course) => {
+        switch (course) {
+            case 'timesone':
+                return '안양역에서 학교';
+            case 'timestwo':
+                return '학교에서 안양역';
+            case 'timesthree':
+                return '범계에서 학교';
+            case 'timesfour':
+                return '학교에서 범계';
+            default:
+                return '알 수 없는 코스';
+        }
+    };
+
     // Cancel reservation handler
     const handleCancelReservation = async (reservationId) => {
         try {
@@ -146,6 +162,7 @@ const Check = () => {
                     <ReservationList>
                         {reservations.map((reservation) => (
                             <ReservationItem key={reservation.id}>
+                                <InfoText>{getCourseName(reservation.course)} </InfoText> {/* 코스 이름 표시 */}
                                 <InfoText>{reservation.reservation_time} 승차</InfoText>
                                 <InfoText>{new Date(reservation.created_at).toLocaleString()}</InfoText>
                                 {reservation.cancelled ? (
