@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
-import img from '../img/pic.jpg'
+import img from '../img/pic.jpg';
+import DeletePopup from './DeletePopup';
 
 // Styled components for layout and buttons
 const Container = styled.div`
@@ -55,6 +56,7 @@ const Check = () => {
     const [user, setUser] = useState(null); // User information
     const [reservation, setReservation] = useState(null); // Reservation information
     const [loading, setLoading] = useState(true);
+    const [showPopup, setShowPopup] = useState(false); // 팝업 표시 상태 관리
 
     // Fetch user and reservation info from server
     useEffect(() => {
@@ -96,15 +98,15 @@ const Check = () => {
                     },
                 }
             );
-            alert('예약이 취소되었습니다.');
+            setShowPopup(true); // 예약 취소 후 팝업 표시
         } catch (error) {
             console.error('예약 취소 중 오류 발생:', error);
         }
     };
 
-     // 현재 날짜를 포맷
-     const today = new Date();
-     const formattedDate = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
+    // 현재 날짜를 포맷
+    const today = new Date();
+    const formattedDate = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
 
     if (loading) return <div>Loading...</div>;
 
@@ -114,7 +116,7 @@ const Check = () => {
 
             {user && (
                 <>
-                <InfoText>{formattedDate}</InfoText>
+                    <p>{formattedDate}</p>
                     <InfoText>{reservation.reservation_time} 승차</InfoText>
                     <ProfileImage src={img} alt="Profile" />
                     
@@ -127,15 +129,13 @@ const Check = () => {
 
                     {/* Close Button */}
                     <CloseButton onClick={() => window.close()}>닫기</CloseButton>
-                
                 </>
             )}
+
+            {/* 예약 취소 후 팝업 표시 */}
+            {showPopup && <DeletePopup onClose={() => setShowPopup(false)} />}
         </Container>
     );
 };
 
 export default Check;
-const today = new Date();
-// 현재 날짜를 가져옵니다.
-
-const formattedDate = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
