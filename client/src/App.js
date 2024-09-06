@@ -4,6 +4,7 @@ import StudentSignup from './components/StudentSignup';
 import DriverSignup from './components/DriverSignup';
 import Login from './components/Login';
 import Reservation from './components/Reservation';
+import Check from './components/Check';
 
 
 
@@ -14,6 +15,7 @@ function App() {
       <DriverSignup/>
       <Login/>
       <Reservation/>
+      <Check/>
     </div>
   );
 }

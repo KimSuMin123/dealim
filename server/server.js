@@ -24,6 +24,9 @@ const User = sequelize.define('User', {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
+    },  name: {
+        type: DataTypes.STRING,
+        allowNull: false, // 이름은 필수 입력
     },
     role: {
         type: DataTypes.ENUM('student', 'driver'),
@@ -191,10 +194,10 @@ app.post('/send-verification-code', (req, res) => {
 
 // 인증번호 확인 및 회원가입 API
 app.post('/verify-code', async (req, res) => {
-    const { name, studentId, phone, email, code, password } = req.body;
+    const { name, studentId, phone, email, code, password } = req.body; // 이름 필드 추가
 
-    if (!email || !code || !password) {
-        return res.status(400).json({ message: '이메일, 인증번호 및 비밀번호가 필요합니다.' });
+    if (!name || !email || !code || !password) {
+        return res.status(400).json({ message: '이름, 이메일, 인증번호 및 비밀번호가 필요합니다.' });
     }
 
     const storedCode = verificationCodes[email]; // 저장된 인증번호 가져오기
@@ -212,6 +215,7 @@ app.post('/verify-code', async (req, res) => {
 
             // 사용자 정보를 DB에 저장
             await User.create({
+                name, // 이름 필드 추가
                 role: studentId ? 'student' : 'driver',
                 student_id: studentId || null,
                 email,
@@ -394,12 +398,61 @@ app.post('/reserve', authenticateToken, async (req, res) => {
     }
 });
 
+// Cancel reservation by reservationId (Delete from DB)
+app.post('/cancel-reservation', authenticateToken, async (req, res) => {
+    const { reservationId } = req.body;
 
+    try {
+        // Find the reservation by ID
+        const reservation = await Reservations.findOne({ where: { id: reservationId } });
+        
+        // If the reservation is not found, return a 404 error
+        if (!reservation) {
+            return res.status(404).json({ message: '예약을 찾을 수 없습니다.' });
+        }
 
-// 보호된 API 엔드포인트 예시
-app.get('/protected', authenticateToken, (req, res) => {
-    res.status(200).json({ message: `안녕하세요, ${req.user.role}님! 이 페이지는 보호된 페이지입니다.` });
+        // Delete the reservation from the DB
+        await reservation.destroy();
+
+        res.status(200).json({ message: '예약이 성공적으로 삭제되었습니다.' });
+    } catch (error) {
+        res.status(500).json({ message: '예약 삭제 중 오류 발생', error: error.message });
+    }
 });
+
+
+// Get current user and their reservation details
+app.get('/protected', authenticateToken, async (req, res) => {
+    try {
+        // 사용자의 이름 및 정보를 가져옴
+        const user = await User.findOne({ where: { id: req.user.id }, attributes: ['name', 'student_id', 'phone_number', 'role'] });
+        
+        // 사용자의 예약 정보를 가져옴
+        const reservation = await Reservations.findOne({ where: { student_id: user.student_id } });
+
+        if (!user) {
+            return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+        }
+
+        if (!reservation) {
+            return res.status(404).json({ message: '예약 정보를 찾을 수 없습니다.' });
+        }
+
+        // 사용자 이름과 예약 정보를 반환
+        res.status(200).json({ 
+            user: {
+                name: user.name,
+                student_id: user.student_id,
+                phone_number: user.phone_number,
+                role: user.role
+            },
+            reservation
+        });
+    } catch (error) {
+        res.status(500).json({ message: '데이터를 가져오는 중 오류 발생', error: error.message });
+    }
+});
+
 
 // 서버 시작
 const PORT = process.env.PORT || 3003;

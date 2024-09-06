@@ -1,12 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ConfirmPopup from '../components/ReservationOk';
+import styled from 'styled-components';
+
+const TimeGrid = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+`;
+
+const TimeButton = styled.button`
+    flex: 1 1 calc(20% - 10px); /* 한 줄에 5개 배치 (100% / 5 = 20%) */
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    
+    &:hover {
+        background-color: #0056b3;
+    }
+`;
 
 const Reservation = () => {
     const [times, setTimes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedTime, setSelectedTime] = useState('');
-    const [reservationMessage, setReservationMessage] = useState(null);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
 
     // 셔틀 시간 데이터를 가져오는 함수
     useEffect(() => {
@@ -24,16 +47,23 @@ const Reservation = () => {
         fetchTimes();
     }, []);
 
+    // 팝업을 열기 위한 함수
+    const openPopup = (time) => {
+        setSelectedTime(time);
+        setIsPopupOpen(true);
+    };
+
+    // 팝업 닫기 함수
+    const closePopup = () => {
+        setIsPopupOpen(false);
+        setSelectedTime('');
+    };
+
     // 셔틀 시간 예약 함수
     const handleReservation = async () => {
-        if (!selectedTime) {
-            setReservationMessage('예약할 시간을 선택해주세요.');
-            return;
-        }
-
         try {
             const token = localStorage.getItem('token'); // 사용자의 JWT 토큰을 로컬스토리지에서 가져옴
-            const response = await axios.post(
+            await axios.post(
                 'http://localhost:3003/reserve',
                 { time: selectedTime },
                 {
@@ -42,9 +72,10 @@ const Reservation = () => {
                     },
                 }
             );
-            setReservationMessage('예약이 성공적으로 완료되었습니다!');
+            alert('예약이 성공적으로 완료되었습니다!');
+            closePopup();
         } catch (error) {
-            setReservationMessage('예약 중 오류가 발생했습니다. 다시 시도해주세요.');
+            alert('예약 중 오류가 발생했습니다. 다시 시도해주세요.');
         }
     };
 
@@ -61,31 +92,26 @@ const Reservation = () => {
     return (
         <div>
             <h2>셔틀 예약 가능한 시간 목록</h2>
-            <ul>
+            <TimeGrid>
                 {times.length > 0 ? (
                     times.map((time, index) => (
-                        <li key={index}>
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="shuttleTime"
-                                    value={time.time}
-                                    onChange={() => setSelectedTime(time.time)}
-                                />
-                                {time.time}
-                            </label>
-                        </li>
+                        <TimeButton key={index} onClick={() => openPopup(time.time)}>
+                            {time.time}
+                        </TimeButton>
                     ))
                 ) : (
-                    <li>예약 가능한 시간이 없습니다.</li>
+                    <div>예약 가능한 시간이 없습니다.</div>
                 )}
-            </ul>
+            </TimeGrid>
 
-            {/* 예약 버튼 */}
-            <button onClick={handleReservation}>예약하기</button>
-
-            {/* 예약 결과 메시지 */}
-            {reservationMessage && <p>{reservationMessage}</p>}
+            {/* 팝업 컴포넌트 */}
+            {isPopupOpen && (
+                <ConfirmPopup
+                    time={selectedTime}
+                    onConfirm={handleReservation}
+                    onCancel={closePopup}
+                />
+            )}
         </div>
     );
 };

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const Login = () => {
-  const [studentIdOrPhone, setStudentIdOrPhone] = useState(''); // 이메일 대신 학번 또는 전화번호 사용
+  const [studentIdOrPhone, setStudentIdOrPhone] = useState(''); // 학번 또는 전화번호
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -14,18 +14,18 @@ const Login = () => {
 
     try {
       const response = await axios.post('http://localhost:3003/login', {
-        studentIdOrPhone, // 수정된 필드명
-        password
+        studentIdOrPhone,
+        password,
       });
       
-      const { token, role } = response.data; // response에서 token과 role을 추출
+      const { token, role, name } = response.data; // 이름 필드도 포함하여 받아오기
 
-      // JWT 토큰 및 역할(role)을 localStorage에 저장
-      localStorage.setItem('token', token); 
+      // JWT 토큰, 역할(role), 이름을 localStorage에 저장
+      localStorage.setItem('token', token);
       localStorage.setItem('role', role);
+      localStorage.setItem('name', name); // 이름도 저장
 
-      // 사용자에게 역할에 따른 메시지 표시
-      alert(`${role === 'student' ? '학생' : '기사'} 회원 로그인 성공!`);
+      alert(`${role === 'student' ? '학생' : '기사'} ${name}님, 로그인 성공!`); // 사용자 이름 표시
       
       setLoading(false);
     } catch (error) {
@@ -39,12 +39,12 @@ const Login = () => {
       <h2>로그인</h2>
       <form onSubmit={handleLogin}>
         <div>
-          <label htmlFor="studentIdOrPhone">학번 또는 전화번호</label> {/* 라벨 수정 */}
+          <label htmlFor="studentIdOrPhone">학번 또는 전화번호</label>
           <input
             type="text"
             id="studentIdOrPhone"
-            value={studentIdOrPhone} // 상태값 변경
-            onChange={(e) => setStudentIdOrPhone(e.target.value)} // 입력 변경 핸들러 수정
+            value={studentIdOrPhone}
+            onChange={(e) => setStudentIdOrPhone(e.target.value)}
             required
           />
         </div>
@@ -68,3 +68,4 @@ const Login = () => {
 };
 
 export default Login;
+
