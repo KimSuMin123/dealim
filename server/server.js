@@ -257,6 +257,7 @@ app.post('/register-driver', async (req, res) => {
         const newDriver = await User.create({
             role: 'driver',
             student_id: null,
+            name : name,
             email: null,
             phone_number: phone,
             bus_number: bus_number,
@@ -421,24 +422,30 @@ app.post('/cancel-reservation', authenticateToken, async (req, res) => {
 });
 
 
-// Get current user and their reservation details
+// Get current user and all their reservations
 app.get('/protected', authenticateToken, async (req, res) => {
     try {
         // 사용자의 이름 및 정보를 가져옴
-        const user = await User.findOne({ where: { id: req.user.id }, attributes: ['name', 'student_id', 'phone_number', 'role'] });
+        const user = await User.findOne({
+            where: { id: req.user.id },
+            attributes: ['name', 'student_id', 'phone_number', 'role']
+        });
         
-        // 사용자의 예약 정보를 가져옴
-        const reservation = await Reservations.findOne({ where: { student_id: user.student_id } });
+        // 사용자의 모든 예약 정보를 가져옴
+        const reservations = await Reservations.findAll({
+            where: { student_id: user.student_id },
+            attributes: ['id', 'reservation_time', 'created_at', 'cancelled']  // 예약 관련 필드
+        });
 
         if (!user) {
             return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
         }
 
-        if (!reservation) {
-            return res.status(404).json({ message: '예약 정보를 찾을 수 없습니다.' });
+        if (!reservations.length) {
+            return res.status(404).json({ message: '예약 정보가 없습니다.' });
         }
 
-        // 사용자 이름과 예약 정보를 반환
+        // 사용자 이름과 모든 예약 정보를 반환
         res.status(200).json({ 
             user: {
                 name: user.name,
@@ -446,7 +453,7 @@ app.get('/protected', authenticateToken, async (req, res) => {
                 phone_number: user.phone_number,
                 role: user.role
             },
-            reservation
+            reservations  // 여러 예약을 반환
         });
     } catch (error) {
         res.status(500).json({ message: '데이터를 가져오는 중 오류 발생', error: error.message });

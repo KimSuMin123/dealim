@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // useNavigate 훅 import
 
 function DriverSignup() {
   const [name, setName] = useState('');
@@ -7,6 +8,8 @@ function DriverSignup() {
   const [password, setPassword] = useState(''); // 비밀번호 필드 추가
   const [responseMessage, setResponseMessage] = useState('');
   const [messageColor, setMessageColor] = useState('');
+
+  const navigate = useNavigate(); // useNavigate 훅 사용
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -44,6 +47,10 @@ function DriverSignup() {
       setResponseMessage(`오류: ${error.message}`);
       setMessageColor('red');
     }
+  };
+
+  const handleLogin = () => {
+    navigate('/'); // 로그인 페이지로 이동
   };
 
   return (
@@ -94,6 +101,7 @@ function DriverSignup() {
       </form>
 
       <p style={{ color: messageColor }}>{responseMessage}</p>
+      <button onClick={handleLogin}>로그인</button> {/* 로그인 페이지로 돌아가는 버튼 */}
     </div>
   );
 }

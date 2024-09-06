@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // useNavigate 훅 import
 
 function StudentSignup() {
   const [name, setName] = useState('');
@@ -9,6 +10,8 @@ function StudentSignup() {
   const [password, setPassword] = useState(''); // 비밀번호 필드 추가
   const [responseMessage, setResponseMessage] = useState('');
   const [messageColor, setMessageColor] = useState('');
+
+  const navigate = useNavigate(); // useNavigate 훅 사용
 
   // 학번이 변경될 때마다 이메일 주소를 자동으로 생성
   useEffect(() => {
@@ -88,6 +91,10 @@ function StudentSignup() {
     }
   };
 
+  const handleLogin = () => {
+    navigate('/'); // 로그인 페이지로 이동
+  };
+
   return (
     <div className="container">
       <h2>학생 회원가입</h2>
@@ -160,8 +167,12 @@ function StudentSignup() {
       </form>
 
       <p style={{ color: messageColor }}>{responseMessage}</p>
+
+      {/* 로그인으로 이동하는 버튼 추가 */}
+      <button onClick={handleLogin}>로그인</button>
     </div>
   );
 }
 
 export default StudentSignup;
+

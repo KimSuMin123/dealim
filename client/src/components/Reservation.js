@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ConfirmPopup from '../components/ReservationOk';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom'; // useNavigate 훅 import
 
 const TimeGrid = styled.div`
     display: flex;
@@ -30,6 +31,7 @@ const Reservation = () => {
     const [error, setError] = useState(null);
     const [selectedTime, setSelectedTime] = useState('');
     const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const navigate = useNavigate(); // useNavigate 훅 사용
 
     // 셔틀 시간 데이터를 가져오는 함수
     useEffect(() => {
@@ -74,6 +76,7 @@ const Reservation = () => {
             );
             alert('예약이 성공적으로 완료되었습니다!');
             closePopup();
+            navigate('/check'); // 예약 성공 후 check 페이지로 이동
         } catch (error) {
             alert('예약 중 오류가 발생했습니다. 다시 시도해주세요.');
         }
