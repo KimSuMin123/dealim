@@ -333,7 +333,7 @@ app.post('/login', async (req, res) => {
 app.get('/times', async (req, res) => {
     try {
         const times = await Times.findAll({
-            attributes: ['time'], // time 필드만 가져오기
+            attributes: ['time', 'people'], // time 필드만 가져오기
         });
 
         if (!times.length) {
