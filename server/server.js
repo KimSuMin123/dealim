@@ -5,7 +5,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const { Sequelize, DataTypes } = require('sequelize');
 const jwt = require('jsonwebtoken'); // JWT 패키지 추가
-
+const cron = require('node-cron');
 dotenv.config();
 
 const app = express();
@@ -636,6 +636,35 @@ app.get('/protected', authenticateToken, async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: '데이터를 가져오는 중 오류 발생', error: error.message });
     }
+});
+
+
+// 매일 자정에 reservations 테이블을 비우고 times 테이블과 users 테이블을 초기화하는 CRON 작업
+cron.schedule('0 0 * * *', async () => {
+    try {
+        console.log('매일 자정 예약 내역 및 관련 데이터 초기화 시작...');
+
+        // reservations 테이블의 모든 내용을 삭제
+        await Reservations.destroy({
+            where: {}, // 조건 없이 모든 데이터 삭제
+            truncate: true, // 테이블을 초기 상태로 재설정
+        });
+
+        // timesone, timestwo, timesthree, timesfour 테이블의 people 값을 0으로 초기화
+        await TimesOne.update({ people: 0 }, { where: {} });
+        await TimesTwo.update({ people: 0 }, { where: {} });
+        await TimesThree.update({ people: 0 }, { where: {} });
+        await TimesFour.update({ people: 0 }, { where: {} });
+
+        // users 테이블의 credits 값을 0으로 초기화
+        await User.update({ credits: 0 }, { where: {} });
+
+        console.log('2시 45분 작업 완료: reservations, times, users 테이블 초기화 성공');
+    } catch (error) {
+        console.error('2시 45분 작업 중 오류 발생:', error);
+    }
+}, {
+    timezone: 'Asia/Seoul' // 한국 시간 기준으로 작업 실행
 });
 
 
