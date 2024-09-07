@@ -113,9 +113,7 @@ const Login = () => {
       // JWT 토큰, 역할(role), 이름을 localStorage에 저장
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
-      localStorage.setItem('name', name); // 이름도 저장
-
-      alert(`${role === 'student' ? '학생' : '기사'} ${name}님, 로그인 성공!`);
+  
 
       setLoading(false);
 

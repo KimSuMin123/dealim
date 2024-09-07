@@ -86,7 +86,7 @@ const ReservationNow = () => {
             <h2>현재 예약 현황 보기</h2>
             <CourseContainer>
                 <CourseSection>
-                    <CourseTitle>안양역에서 학교 (TimesOne)</CourseTitle>
+                    <CourseTitle>안양역에서 학교</CourseTitle>
                     <Table>
                         <thead>
                             <TableRow>
@@ -112,7 +112,7 @@ const ReservationNow = () => {
                 </CourseSection>
 
                 <CourseSection>
-                    <CourseTitle>학교에서 안양역 (TimesTwo)</CourseTitle>
+                    <CourseTitle>학교에서 안양역</CourseTitle>
                     <Table>
                         <thead>
                             <TableRow>
@@ -138,7 +138,7 @@ const ReservationNow = () => {
                 </CourseSection>
 
                 <CourseSection>
-                    <CourseTitle>범계에서 학교 (TimesThree)</CourseTitle>
+                    <CourseTitle>범계에서 학교</CourseTitle>
                     <Table>
                         <thead>
                             <TableRow>
@@ -164,7 +164,7 @@ const ReservationNow = () => {
                 </CourseSection>
 
                 <CourseSection>
-                    <CourseTitle>학교에서 범계 (TimesFour)</CourseTitle>
+                    <CourseTitle>학교에서 범계</CourseTitle>
                     <Table>
                         <thead>
                             <TableRow>

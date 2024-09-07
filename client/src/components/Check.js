@@ -154,7 +154,7 @@ const Check = () => {
 
             {user && (
                 <>
-                    <p>{formattedDate}</p>
+                    <InfoText>{formattedDate}</InfoText>
                     <ProfileImage src={img} alt="Profile" />
                     <InfoText>{user.student_id}</InfoText>
                     <InfoText>{user.name}</InfoText>
@@ -176,8 +176,7 @@ const Check = () => {
                         ))}
                     </ReservationList>
                     <ActionButton onClick={goToReservationNow}>예약 현황</ActionButton>
-                    {/* Close Button */}
-                    <CloseButton onClick={() => window.close()}>닫기</CloseButton>
+                  
                 </>
             )}
 
