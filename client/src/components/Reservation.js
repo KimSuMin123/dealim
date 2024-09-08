@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ConfirmPopup from '../components/ReservationOk';
+import FullPopup from '../components/FullPopup'; // New Popup for Full Capacity
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
@@ -24,15 +25,15 @@ const TimeButton = styled.button`
   flex: 1 1 100%; // Full width on smaller screens
   max-width: calc(20% - 10px); // Maximum five items per row
   padding: 12px;
-  background-color: #007bff;
+  background-color: ${props => props.isFull ? '#6c757d' : '#007bff'}; // Gray if full, blue if not
   color: white;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
+  cursor: ${props => props.isFull ? 'not-allowed' : 'pointer'};
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: ${props => props.isFull ? '#6c757d' : '#0056b3'};
   }
 
   @media (max-width: 768px) {
@@ -65,6 +66,7 @@ const Reservation = () => {
     const [selectedTime, setSelectedTime] = useState('');
     const [selectedCourse, setSelectedCourse] = useState('timesone');
     const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [isFullPopupOpen, setIsFullPopupOpen] = useState(false); // State for full capacity popup
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -99,14 +101,22 @@ const Reservation = () => {
         return koreanNow < tenMinutesBeforeShuttle;
     };
 
-    const openPopup = (time) => {
-        setSelectedTime(time);
-        setIsPopupOpen(true);
+    const openPopup = (time, isFull) => {
+        if (isFull) {
+            setIsFullPopupOpen(true); // Open full capacity popup if shuttle is full
+        } else {
+            setSelectedTime(time);
+            setIsPopupOpen(true);
+        }
     };
 
     const closePopup = () => {
         setIsPopupOpen(false);
         setSelectedTime('');
+    };
+
+    const closeFullPopup = () => {
+        setIsFullPopupOpen(false);
     };
 
     const handleReservation = async () => {
@@ -143,13 +153,20 @@ const Reservation = () => {
             </SelectCourse>
             <TimeGrid>
                 {times.length > 0 ? times.filter((time) => isTimeReservable(time.time)).map((time, index) => (
-                    <TimeButton key={index} onClick={() => openPopup(time.time)}>
-                        {time.time}
+                    <TimeButton
+                        key={index}
+                        isFull={time.people >= 60} // Check if reservation is full
+                        onClick={() => openPopup(time.time, time.people >= 60)}
+                    >
+                        {time.time} {time.people >= 60 && "(만차)"}
                     </TimeButton>
                 )) : <div>예약 가능한 시간이 없습니다.</div>}
             </TimeGrid>
             {isPopupOpen && (
                 <ConfirmPopup time={selectedTime} onConfirm={handleReservation} onCancel={closePopup} />
+            )}
+            {isFullPopupOpen && (
+                <FullPopup onCancel={closeFullPopup} /> // Display full capacity popup
             )}
         </Container>
     );
