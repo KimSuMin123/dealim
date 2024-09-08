@@ -71,6 +71,11 @@ const ReservationNow = () => {
         fetchTimes(); // 컴포넌트가 로드될 때 호출
     }, []);
 
+    // 잔여석 계산 함수
+    const calculateRemainingSeats = (people) => {
+        return people < 30 ? 30 - people : 60 - people;
+    };
+
     // 로딩 중일 때 표시할 내용
     if (loading) {
         return <p>로딩 중...</p>;
@@ -92,6 +97,7 @@ const ReservationNow = () => {
                             <TableRow>
                                 <TableHeader>시간</TableHeader>
                                 <TableHeader>예약 인원</TableHeader>
+                                <TableHeader>잔여석</TableHeader> {/* 잔여석 추가 */}
                             </TableRow>
                         </thead>
                         <tbody>
@@ -100,11 +106,12 @@ const ReservationNow = () => {
                                     <TableRow key={index}>
                                         <TableCell>{time.time}</TableCell>
                                         <TableCell>{time.people}명</TableCell>
+                                        <TableCell>{calculateRemainingSeats(time.people)}석</TableCell> {/* 잔여석 계산 */}
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan="2">예약 가능한 시간이 없습니다.</TableCell>
+                                    <TableCell colSpan="3">예약 가능한 시간이 없습니다.</TableCell>
                                 </TableRow>
                             )}
                         </tbody>
@@ -118,6 +125,7 @@ const ReservationNow = () => {
                             <TableRow>
                                 <TableHeader>시간</TableHeader>
                                 <TableHeader>예약 인원</TableHeader>
+                                <TableHeader>잔여석</TableHeader> {/* 잔여석 추가 */}
                             </TableRow>
                         </thead>
                         <tbody>
@@ -126,11 +134,12 @@ const ReservationNow = () => {
                                     <TableRow key={index}>
                                         <TableCell>{time.time}</TableCell>
                                         <TableCell>{time.people}명</TableCell>
+                                        <TableCell>{calculateRemainingSeats(time.people)}석</TableCell> {/* 잔여석 계산 */}
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan="2">예약 가능한 시간이 없습니다.</TableCell>
+                                    <TableCell colSpan="3">예약 가능한 시간이 없습니다.</TableCell>
                                 </TableRow>
                             )}
                         </tbody>
@@ -144,6 +153,7 @@ const ReservationNow = () => {
                             <TableRow>
                                 <TableHeader>시간</TableHeader>
                                 <TableHeader>예약 인원</TableHeader>
+                                <TableHeader>잔여석</TableHeader> {/* 잔여석 추가 */}
                             </TableRow>
                         </thead>
                         <tbody>
@@ -152,11 +162,12 @@ const ReservationNow = () => {
                                     <TableRow key={index}>
                                         <TableCell>{time.time}</TableCell>
                                         <TableCell>{time.people}명</TableCell>
+                                        <TableCell>{calculateRemainingSeats(time.people)}석</TableCell> {/* 잔여석 계산 */}
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan="2">예약 가능한 시간이 없습니다.</TableCell>
+                                    <TableCell colSpan="3">예약 가능한 시간이 없습니다.</TableCell>
                                 </TableRow>
                             )}
                         </tbody>
@@ -170,6 +181,7 @@ const ReservationNow = () => {
                             <TableRow>
                                 <TableHeader>시간</TableHeader>
                                 <TableHeader>예약 인원</TableHeader>
+                                <TableHeader>잔여석</TableHeader> {/* 잔여석 추가 */}
                             </TableRow>
                         </thead>
                         <tbody>
@@ -178,11 +190,12 @@ const ReservationNow = () => {
                                     <TableRow key={index}>
                                         <TableCell>{time.time}</TableCell>
                                         <TableCell>{time.people}명</TableCell>
+                                        <TableCell>{calculateRemainingSeats(time.people)}석</TableCell> {/* 잔여석 계산 */}
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan="2">예약 가능한 시간이 없습니다.</TableCell>
+                                    <TableCell colSpan="3">예약 가능한 시간이 없습니다.</TableCell>
                                 </TableRow>
                             )}
                         </tbody>

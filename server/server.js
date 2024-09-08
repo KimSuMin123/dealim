@@ -659,9 +659,9 @@ cron.schedule('0 0 * * *', async () => {
         // users 테이블의 credits 값을 0으로 초기화
         await User.update({ credits: 0 }, { where: {} });
 
-        console.log('2시 45분 작업 완료: reservations, times, users 테이블 초기화 성공');
+        console.log('작업 완료: reservations, times, users 테이블 초기화 성공');
     } catch (error) {
-        console.error('2시 45분 작업 중 오류 발생:', error);
+        console.error('작업 중 오류 발생:', error);
     }
 }, {
     timezone: 'Asia/Seoul' // 한국 시간 기준으로 작업 실행
