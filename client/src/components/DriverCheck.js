@@ -69,11 +69,17 @@ const DriverCheck = () => {
         fetchTimes();
     }, []);
 
+    // 잔여석 계산 함수
+    const calculateRemainingSeats = (people) => {
+        return people < 30 ? 30 - people : 60 - people;
+    };
+
+    // 배차 상태를 계산하는 함수
     const getVehicleRequirement = (people) => {
         if (people <= 5) return "배차 없음";
         if (people <= 29) return "1대 배차";
         if (people <= 59) return "2대 배차";
-        return "만차(2대 배차)";
+        return "2대 배차 (만차)";
     };
 
     if (loading) {
@@ -102,18 +108,25 @@ const DriverCheck = () => {
                                     <TableHeader>시간</TableHeader>
                                     <TableHeader>예약 인원</TableHeader>
                                     <TableHeader>배차 상태</TableHeader>
+                                    <TableHeader>잔여석</TableHeader> {/* 잔여석 추가 */}
                                 </TableRow>
                             </thead>
                             <tbody>
-                                {timeSlots.length > 0 ? timeSlots.map((time, idx) => (
-                                    <TableRow key={idx}>
-                                        <TableCell>{time.time}</TableCell>
-                                        <TableCell>{time.people}명</TableCell>
-                                        <TableCell>{getVehicleRequirement(time.people)}</TableCell>
-                                    </TableRow>
-                                )) : (
+                                {timeSlots.length > 0 ? timeSlots.map((time, idx) => {
+                                    const vehicleRequirement = getVehicleRequirement(time.people);
+                                    const remainingSeats = vehicleRequirement === "배차 없음" ? "" : `${calculateRemainingSeats(time.people)}석`;
+                                    
+                                    return (
+                                        <TableRow key={idx}>
+                                            <TableCell>{time.time}</TableCell>
+                                            <TableCell>{time.people}명</TableCell>
+                                            <TableCell>{vehicleRequirement}</TableCell>
+                                            <TableCell>{remainingSeats}</TableCell> {/* 배차 없으면 빈칸, 있으면 잔여석 계산 */}
+                                        </TableRow>
+                                    );
+                                }) : (
                                     <TableRow>
-                                        <TableCell colSpan="3">예약 가능한 시간이 없습니다.</TableCell>
+                                        <TableCell colSpan="4">예약 가능한 시간이 없습니다.</TableCell>
                                     </TableRow>
                                 )}
                             </tbody>
