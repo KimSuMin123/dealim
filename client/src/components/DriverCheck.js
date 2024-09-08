@@ -76,7 +76,6 @@ const DriverCheck = () => {
 
     // 배차 상태를 계산하는 함수
     const getVehicleRequirement = (people) => {
-        if (people <= 5) return "배차 없음";
         if (people <= 29) return "1대 배차";
         if (people <= 59) return "2대 배차";
         return "2대 배차 (만차)";

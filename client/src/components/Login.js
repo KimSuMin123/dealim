@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // useNavigate 훅 import
 import styled from 'styled-components'; // styled-components import
-
+import bus from "../img/bus.png";
 // 스타일 정의
 const LoginContainer = styled.div`
   max-width: 400px;
@@ -71,6 +71,10 @@ const SignupButton = styled.button`
   font-size: 16px;
 `;
 
+const Img = styled.img`
+  width: 400px;
+  height: 300px;
+`;
 const Login = () => {
   const [studentIdOrPhone, setStudentIdOrPhone] = useState(''); // 학번 또는 전화번호
   const [password, setPassword] = useState('');
@@ -141,9 +145,10 @@ const Login = () => {
   return (
     <LoginContainer>
       <Title>로그인</Title>
+      <Img src={bus} alt="버스 이미지" />
       <Form onSubmit={handleLogin}>
         <div>
-          <Label htmlFor="studentIdOrPhone">학번 또는 전화번호</Label>
+          <Label htmlFor="studentIdOrPhone">학번 & 전화번호</Label>
           <Input
             type="text"
             id="studentIdOrPhone"
@@ -153,7 +158,7 @@ const Login = () => {
           />
         </div>
         <div>
-          <Label htmlFor="password">비밀번호</Label>
+          <Label htmlFor="password"> 비 밀 번 호&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </Label>
           <Input
             type="password"
             id="password"
